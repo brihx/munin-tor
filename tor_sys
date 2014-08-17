@@ -1,0 +1,47 @@
+#!/bin/sh
+
+output_config() {
+    echo "graph_title Tor system usage"
+    echo "graph_category Tor"
+    echo "mem.label % of memory used"
+    echo "cpu.label % of cpu used"
+}
+
+output_values() {
+    printf "mem.value %.1f\n" $(mem)
+    printf "cpu.value %.1f\n" $(cpu)
+}
+
+mem() {
+   ps -C tor -o %mem | tail -n +2
+}
+
+cpu() {
+  ps -C tor -o %cpu | tail -n +2
+}
+
+output_usage() {
+    printf >&2 "%s - munin plugin to graph Tor system usage\n" ${0##*/}
+    printf >&2 "Usage: %s [config]\n" ${0##*/}
+}
+
+case $# in
+    0)
+        output_values
+        ;;
+    1)
+        case $1 in
+            config)
+                output_config
+                ;;
+            *)
+                output_usage
+                exit 1
+                ;;
+        esac
+        ;;
+    *)
+        output_usage
+        exit 1
+        ;;
+esac
