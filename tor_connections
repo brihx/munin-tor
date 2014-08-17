@@ -1,0 +1,41 @@
+#!/bin/sh
+
+output_config() {
+    echo "graph_title Tor connections"
+    echo "graph_category Tor"
+    echo "connections.label Number of connections"
+}
+
+output_values() {
+    printf "connections.value %d\n" $(number_of_connexions)
+}
+
+number_of_connexions() {
+   lsof -i -P -n | grep tor | grep ESTABLISHED | wc -l
+}
+
+output_usage() {
+    printf >&2 "%s - munin plugin to graph Tor stats\n" ${0##*/}
+    printf >&2 "Usage: %s [config]\n" ${0##*/}
+}
+
+case $# in
+    0)
+        output_values
+        ;;
+    1)
+        case $1 in
+            config)
+                output_config
+                ;;
+            *)
+                output_usage
+                exit 1
+                ;;
+        esac
+        ;;
+    *)
+        output_usage
+        exit 1
+        ;;
+esac
